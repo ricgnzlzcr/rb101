@@ -1,10 +1,11 @@
 require 'pry'
 require 'pry-byebug'
 
-CARD_NAMES = {two: "2", three: "3", four: "4", five: "5", six: "6", seven: "7", eight: "8", nine: "9",
-                ten: "10", jack: "Jack", queen: "Queen", king: "King", ace: "Ace"}
-CARD_VALUES = {two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-                jack: 10, queen: 10, king: 10, ace: 11}
+CARD_NAMES = { two: "2", three: "3", four: "4", five: "5", six: "6", seven: "7",
+               eight: "8", nine: "9", ten: "10", jack: "Jack", queen: "Queen",
+               king: "King", ace: "Ace" }
+CARD_VALUES = { two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8,
+                nine: 9, ten: 10, jack: 10, queen: 10, king: 10, ace: 11 }
 
 def prompt(str)
   puts "=> #{str}"
@@ -28,14 +29,14 @@ end
 
 # Returns deck card symbol i.e. :two or :king
 def deal_card(deck)
-  card = deck.select {|_, count| count > 0 }.keys.sample
+  card = deck.select { |_, count| count > 0 }.keys.sample
   deck[card] -= 1
   card
 end
 
 def get_score(hand)
   aces_count = hand.count(:ace)
-  score = hand.map {|card| CARD_VALUES[card]}.reduce(:+)
+  score = hand.map { |card| CARD_VALUES[card] }.reduce(:+)
   while aces_count > 0 && score > 21
     score -= 10
     aces_count -= 1
@@ -44,13 +45,13 @@ def get_score(hand)
 end
 
 def bust?(hand)
-  get_score(hand) > 21 ? true: false
+  get_score(hand) > 21
 end
 
 def player_turn(deck, p_hand)
   loop do
-    hand = p_hand.map {|card| CARD_NAMES[card].to_s}
-    prompt "Current hand: #{hand.join(', ')}. Would you like to 'hit' or 'stay'?"
+    hand = p_hand.map { |card| CARD_NAMES[card].to_s }
+    prompt "Hand: #{hand.join(', ')}. Would you like to 'hit' or 'stay'?"
     answer = gets.chomp
     break if answer == 'stay'
     if answer != 'hit'
@@ -71,9 +72,8 @@ end
 def declare_winner(p_hand, d_hand)
   player_score = get_score(p_hand)
   dealer_score = get_score(d_hand)
-  printable_p_hand = p_hand.map {|card| CARD_NAMES[card].to_s}.join(', ')
-  printable_d_hand = d_hand.map {|card| CARD_NAMES[card].to_s}.join(', ')
-  
+  printable_p_hand = p_hand.map { |card| CARD_NAMES[card].to_s }.join(', ')
+  printable_d_hand = d_hand.map { |card| CARD_NAMES[card].to_s }.join(', ')
   winner = if player_score > dealer_score
              'Player'
            elsif dealer_score > player_score
@@ -81,7 +81,6 @@ def declare_winner(p_hand, d_hand)
            else
              'Tie'
            end
-           
   prompt "Your score: #{player_score}. Your cards: #{printable_p_hand}"
   prompt "Dealer score: #{dealer_score}. Dealer cards: #{printable_d_hand}"
   if winner == 'Tie'
@@ -116,7 +115,6 @@ loop do
     prompt "Dealer busts! Player wins!"
     play_again? ? next : break
   end
-  #work on declare_winner function
   declare_winner(player_hand, dealer_hand)
   play_again? ? next : break
 end
