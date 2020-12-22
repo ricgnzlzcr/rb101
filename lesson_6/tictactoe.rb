@@ -53,8 +53,8 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def find_at_risk_square(line, board)
-  if board.values_at(*line).count(COMPUTER_MARKER) == 2
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
     board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
   else
     nil
@@ -75,42 +75,29 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
-  WINNING_LINES.each do |line|
-    player_hash = {}
-    line.each do |pos|
-      if brd[pos] == PLAYER_MARKER
-        player_hash[pos] = PLAYER_MARKER
-      elsif brd[pos] == COMPUTER_MARKER
-        player_hash[pos] = COMPUTER_MARKER
-      else
-        player_hash[pos] = INITIAL_MARKER
-      end
-    end
-    player_spaces_count = player_hash.values.count(PLAYER_MARKER)
-    empty_square_count = player_hash.values.count(INITIAL_MARKER)
-    if player_spaces_count == 2 && empty_square_count == 1
-      winning_position = player_hash.key(INITIAL_MARKER)
-      brd[winning_position] = COMPUTER_MARKER
-      return
-    end
-  end
-  # 
   square = nil
+
+  # defense first
   WINNING_LINES.each do |line|
-    square = find_at_risk_square(line, brd)
+    square = find_at_risk_square(line, brd, PLAYER_MARKER)
     break if square
   end
 
+  # offense
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, COMPUTER_MARKER)
+      break if square
+    end
+  end
+
+  # just pick a square
   if !square
     square = empty_squares(brd).sample
   end
 
   brd[square] = COMPUTER_MARKER
-  
-  # Legacy Code
-  #square = empty_squares(brd).sample
-  #brd[square] = COMPUTER_MARKER
-end
+endn
 
 def block_player_win!(brd, line)
   line.each { |pos| brd[pos] = COMPUTER_MARKER if brd[pos] == INITIAL_MARKER }  
