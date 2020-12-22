@@ -4,7 +4,7 @@ require 'pry-byebug'
 CARD_NAMES = {two: "2", three: "3", four: "4", five: "5", six: "6", seven: "7", eight: "8", nine: "9",
                 ten: "10", jack: "Jack", queen: "Queen", king: "King", ace: "Ace"}
 CARD_VALUES = {two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-                jack: 10, queen: 10, king: 10, ace: "wild"}
+                jack: 10, queen: 10, king: 10, ace: 11}
 
 def prompt(str)
   puts "=> #{str}"
@@ -53,6 +53,10 @@ def player_turn(deck, p_hand)
     prompt "Current hand: #{hand.join(', ')}. Would you like to 'hit' or 'stay'?"
     answer = gets.chomp
     break if answer == 'stay'
+    if answer != 'hit'
+      prompt "Incorrect command. Choose 'hit' or 'stay'."
+      next
+    end
     p_hand.push(deal_card(deck))
     break if bust?(p_hand)
   end
@@ -76,13 +80,13 @@ loop do
   dealer_hand = []
   deal_initial_cards(deck, player_hand, dealer_hand)
   player_turn(deck, player_hand)
-  break
-  if get_score(player_hand) < 0
+  if bust?(player_hand)
     prompt "Player busts! Dealer wins!"
     break
   end
+  # START WORKING HERE
   dealer_turn(deck, dealer_hand)
-  if get_score(dealer_hand) < 0
+  if bust?(dealer_hand)
     prompt "Dealer busts! Player wins!"
     break
   end
