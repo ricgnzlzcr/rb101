@@ -63,11 +63,38 @@ def player_turn(deck, p_hand)
 end
 
 def dealer_turn(deck, d_hand)
-  
+  while get_score(d_hand) < 17
+    d_hand.push(deal_card(deck))
+  end
 end
 
-def declare_winner(p_score, d_score)
+def declare_winner(p_hand, d_hand)
+  player_score = get_score(p_hand)
+  dealer_score = get_score(d_hand)
+  printable_p_hand = p_hand.map {|card| CARD_NAMES[card].to_s}.join(', ')
+  printable_d_hand = d_hand.map {|card| CARD_NAMES[card].to_s}.join(', ')
+  
+  winner = if player_score > dealer_score
+             'Player'
+           elsif dealer_score > player_score
+             'Dealer'
+           else
+             'Tie'
+           end
+           
+  prompt "Your score: #{player_score}. Your cards: #{printable_p_hand}"
+  prompt "Dealer score: #{dealer_score}. Dealer cards: #{printable_d_hand}"
+  if winner == 'Tie'
+    prompt "You and dealer tie!"
+  else
+    prompt "#{winner} wins this round!"
+  end
+end
 
+def play_again?
+  prompt "Play again? (y/n)"
+  answer = gets.chomp.downcase
+  answer.start_with?('y')
 end
 
 # Start program
@@ -82,18 +109,16 @@ loop do
   player_turn(deck, player_hand)
   if bust?(player_hand)
     prompt "Player busts! Dealer wins!"
-    break
+    play_again? ? next : break
   end
-  # START WORKING HERE
   dealer_turn(deck, dealer_hand)
   if bust?(dealer_hand)
     prompt "Dealer busts! Player wins!"
-    break
+    play_again? ? next : break
   end
-  declare_winner(player_score, dealer_score)
-  prompt "Play again? (y/n)"
-  answer = gets.chomp.downcase
-  break unless answer.start_with('y')
+  #work on declare_winner function
+  declare_winner(player_hand, dealer_hand)
+  play_again? ? next : break
 end
 
 prompt "Thanks for playing Twenty-One. See you next time!"
